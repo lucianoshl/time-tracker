@@ -1,0 +1,8 @@
+{
+  "name": "time-tracker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:lucianoshl/time-tracker.git",
+  "author": "Luciano Lopes <lucianoshl@gmail.com>",
+  "license": "MIT"
+}
