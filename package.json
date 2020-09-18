@@ -4,5 +4,19 @@
   "main": "index.js",
   "repository": "git@github.com:lucianoshl/time-tracker.git",
   "author": "Luciano Lopes <lucianoshl@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "edit-json-file": "^1.4.1",
+    "electron": "^10.1.2",
+    "electron-reload": "^1.5.0",
+    "macos-notification-state": "^1.3.1",
+    "moment": "^2.28.0"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^2.0.3"
+  }
 }
