@@ -1,8 +1,10 @@
 const { app, Menu, Tray, nativeImage } = require('electron');
+app.dock.hide();
 const { getSessionState } = require('macos-notification-state');
 const path = require('path');
 const moment = require('moment');
 const register = require("./event_register");
+
 
 require('electron-reload')(__dirname, {
   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
@@ -14,12 +16,12 @@ const updateTray = () => {
   let current;
   let startCount = false;
 
-  while(current = currentList.shift()){
-    if (current.type == 0){
+  while (current = currentList.shift()) {
+    if (current.type == 0) {
       startCount = true;
     }
 
-    if (startCount){
+    if (startCount) {
       calcList.push(current);
     }
   }
@@ -49,9 +51,22 @@ const mainTick = (args) => {
 
 let tray = null
 app.whenReady().then(() => {
-  tray = new Tray(path.join(__dirname,"/icon16.png"));
+  const imageTray = nativeImage.createFromPath(path.join(__dirname, "/icon.png"))
+  imageTray.setTemplateImage(true)
+  tray = new Tray(imageTray.resize({ width: 16, height: 16 }));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Exit',
+      click() {
+        app.quit()
+      }
+    }
+  ]);
+  tray.setContextMenu(contextMenu);
+
+  register.writeEntry(0);
 
   mainTick({ tray })
-  setInterval(() => mainTick({ tray }),1000 );
+  setInterval(() => mainTick({ tray }), 1000);
 
 });

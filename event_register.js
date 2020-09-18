@@ -6,12 +6,15 @@ const register = {};
 
 let file = editJsonFile(`${__dirname}/content.json`);
 
-const writeEntry = (type,lastItem) => {
+const writeEntry = register.writeEntry = (type,lastItem) => {
   const list = register.getList();
-  if (lastItem && lastItem.type === type){
+  lastItem = lastItem || list.slice(-1)[0];
+
+  if (!lastItem){
+    register.registerZero();
+  } else if (lastItem.type === type){
     lastItem.time = new Date().getTime()
   } else {
-    list.push({ type: 0, time: new Date().getTime() })
     list.push({ type, time: new Date().getTime() })
   }
 
@@ -21,6 +24,12 @@ const writeEntry = (type,lastItem) => {
 const registerEntry = (type) => {
   const lastItem = register.getList().slice(-1)[0];
   writeEntry(type,lastItem)
+};
+
+register.registerZero = (externalList) => {
+  const list = externalList || register.getList();
+  list.push({ type: 0, time: new Date().getTime() })
+  file.save();
 };
 
 register.getList = () => {
