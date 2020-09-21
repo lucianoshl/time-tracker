@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize';
-import configFolder from './config_folder';
+// import configFolder from './config_folder';
 
-const sequelize = new Sequelize({
+const connection = new Sequelize({
   dialect: 'sqlite',
-  storage: `${configFolder}/${process.DATABASE}`,
+  storage: `${process.env.DATABASE}`,
 });
 
-export default sequelize;
+export default connection;
