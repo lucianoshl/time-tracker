@@ -11,9 +11,10 @@ initializer.run = () => {
 
   if (existsSync(especiftEnvConfig)) {
     const envConfig = dotenv.parse(readFileSync(especiftEnvConfig));
-    for (const k in envConfig) {
+
+    Object.keys(envConfig).forEach((k) => {
       process.env[k] = envConfig[k];
-    }
+    });
   }
 };
 

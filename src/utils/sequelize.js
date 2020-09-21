@@ -1,9 +1,9 @@
-import { Sequelize, Model, DataTypes } from 'sequelize';
-import configDir from './config_folder';
+import { Sequelize } from 'sequelize';
+import configFolder from './config_folder';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: `${configDir}/${process.DATABASE}`,
+  storage: `${configFolder}/${process.DATABASE}`,
 });
 
 export default sequelize;

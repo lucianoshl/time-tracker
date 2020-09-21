@@ -1,3 +1,3 @@
-const entry_register = {};
+const entryRegister = {};
 
-export default entry_register;
+export default entryRegister;
