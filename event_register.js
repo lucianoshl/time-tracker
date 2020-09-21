@@ -14,8 +14,11 @@ const writeEntry = register.writeEntry = (type,lastItem) => {
     register.registerZero();
   } else if (lastItem.type === type){
     lastItem.time = new Date().getTime()
+    lastItem.label = moment().utc(lastItem.format("HH:mm"))
   } else {
-    list.push({ type, time: new Date().getTime() })
+    var item = { type, time: new Date().getTime() }
+    item.label = moment().utc(lastItem.format("HH:mm"))
+    list.push()
   }
 
   file.save();
