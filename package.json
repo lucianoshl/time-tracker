@@ -11,7 +11,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn eslint --fix"
+      "pre-commit": "yarn eslint . --fix"
     }
  },
   "dependencies": {
