@@ -1,95 +1,45 @@
-// const {
-//   app, Menu, Tray, nativeImage,
-// } = require('electron');
-// // app.dock.hide();
-// // const { getSessionState } = require('macos-notification-state');
-// const path = require('path');
-// const moment = require('moment');
-// const register = require('./event_register');
+import {
+  app, Menu, Tray, nativeImage,
+} from 'electron';
 
-// const contextMenu = Menu.buildFromTemplate([
-//   {
-//     label: 'Exit',
-//     click() {
-//       app.quit();
-//     },
-//   },
-// ]);
+import path from 'path';
 
-// require('electron-reload')(__dirname, {
-//   electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
-// });
+import moment from 'moment';
+import session from './src/services/session';
+import entryRegister from './src/services/entry_register';
 
-// const updateTray = () => {
-//   const currentList = register.getList().slice();
-//   let calcList = [];
-//   let current;
-//   let startCount = false;
+let tray = null;
 
-//   while (current = currentList.shift()) {
-//     if (current.type == 0) {
-//       startCount = true;
-//     }
+const updateTray = () => {
+  const sumarized = entryRegister.sumarize();
+  const target = moment.utc(1000 * 60 * 60 * 8 - sumarized);
 
-//     if (startCount) {
-//       calcList.push(current);
-//     }
-//   }
+  const time = moment().startOf('day').milliseconds(sumarized).format('HH:mm');
 
-//   calcList = calcList.reverse();
-//   let sum = 0;
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: `Actual: ${time}` },
+    { label: `Missing: ${target.format('HH:mm')}` },
+    {
+      label: 'Exit',
+      click() {
+        app.quit();
+      },
+    },
+  ]));
+};
 
-//   for (let i = 0; i < calcList.length - 1; i += 2) {
-//     const currentElement = calcList[i];
-//     const nextElement = calcList[i + 1];
+const mainTick = (args) => {
+  console.log('tick');
+  const event = session.isLocked() ? entryRegister.register('LOCKED') : entryRegister.register('UNLOCK');
+  updateTray({ ...args, event });
+};
 
-//     sum += currentElement.time - nextElement.time;
-//   }
+app.whenReady().then(() => {
+  const imageTray = nativeImage.createFromPath(path.join(__dirname, '/icon.png'));
+  tray = new Tray(imageTray.resize({ width: 16, height: 16 }));
 
-//   const time = moment.utc(sum).format('HH:mm');
+  entryRegister.register('APP_START');
 
-//   tray.setToolTip(time);
-//   tray.setTitle(` ${time}`);
-
-//   const target = moment.utc(1000 * 60 * 60 * 8 - sum);
-
-//   contextMenu.items[0].label = time;
-
-//   tray.setContextMenu(Menu.buildFromTemplate([
-//     { label: `Actual: ${time}` },
-//     { label: `Missing: ${target.format('HH:mm')}` },
-//     {
-//       label: 'Exit',
-//       click() {
-//         app.quit();
-//       },
-//     },
-//   ]));
-//   console.log(moment('09-21-2020 09:30').toDate().getTime());
-// };
-
-// const mainTick = (args) => {
-//   // const state = getSessionState();
-//   // const locked = state === 'SESSION_SCREEN_IS_LOCKED';
-
-//   const { execSync } = require('child_process');
-//   const state = execSync('ps -ef | grep kscreenlocker | wc -l');
-
-//   const locked = state === '2';
-
-//   locked ? register.isLocked() : register.inUnlocked();
-//   updateTray(args);
-// };
-
-// let tray = null;
-// app.whenReady().then(() => {
-//   const imageTray = nativeImage.createFromPath(path.join(__dirname, '/icon.png'));
-//   imageTray.setTemplateImage(true);
-//   tray = new Tray(imageTray.resize({ width: 16, height: 16 }));
-//   tray.setContextMenu(contextMenu);
-
-//   register.writeEntry(0);
-
-//   mainTick({ tray });
-//   setInterval(() => mainTick({ tray }), 1000);
-// });
+  mainTick({ tray });
+  setInterval(() => mainTick({ tray }), 1000);
+});

@@ -6,7 +6,7 @@
   "author": "Luciano Lopes <lucianoshl@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "electron .",
+    "electron": "electron .",
     "test": "NODE_ENV=test mocha",
     "test-watch": "nodemon --exec \"yarn test test/entry_register_test.js\""
   },

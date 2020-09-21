@@ -7,7 +7,7 @@ const { Event } = models;
 const entryRegister = {};
 const tolerance = 1000 * 60 * 5;
 
-entryRegister.register = async (type, date) => {
+entryRegister.register = async (type, date = new Date()) => {
   const lastEvent = await Event.findOne({
     order: [['ocurrence', 'DESC']],
   });
