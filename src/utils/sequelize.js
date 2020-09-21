@@ -1,9 +1,12 @@
 import { Sequelize } from 'sequelize';
-// import configFolder from './config_folder';
+import configFolder from './config_folder';
 
-const connection = new Sequelize({
-  dialect: 'sqlite',
-  storage: `${process.env.DATABASE}`,
-});
+let storage = process.env.DATABASE;
+
+if (process.env.DATABASE.indexOf('sqlite') !== -1) {
+  storage = `${configFolder}/${storage}`;
+}
+
+const connection = new Sequelize({ dialect: 'sqlite', storage });
 
 export default connection;
