@@ -14,9 +14,9 @@ const updateTray = async () => {
   const sumarized = await entryRegister.sumarize();
   const target = 1000 * 60 * 60 * 8 - sumarized;
 
-  const time = moment().startOf('day').add(sumarized,'milliseconds').format('HH:mm');
+  const time = moment().startOf('day').add(sumarized, 'milliseconds').format('HH:mm');
 
-  const tail = moment().startOf('day').add(target,'milliseconds').format('HH:mm');
+  const tail = moment().startOf('day').add(target, 'milliseconds').format('HH:mm');
 
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: `Actual: ${time}` },
@@ -31,8 +31,8 @@ const updateTray = async () => {
 };
 
 const mainTick = async (args) => {
-  const isLocked =  session.isLocked();
-  console.log(new Date(),isLocked);
+  const isLocked = session.isLocked();
+  console.log(new Date(), isLocked);
   const event = isLocked ? entryRegister.register('LOCKED') : entryRegister.register('UNLOCK');
   await updateTray({ ...args, event });
 };
