@@ -6,13 +6,16 @@
   "author": "Luciano Lopes <lucianoshl@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "electron": "electron .",
+    "build": "rm -rf dist && babel src -d dist",
+    "electron": "yarn build && electron dist/electron/app.js",
     "test": "NODE_ENV=test mocha",
-    "test-watch": "nodemon --exec \"yarn test test/entry_register_test.js\""
+    "electron-watch": "nodemon --watch src --exec \"yarn electron\"",
+    "test-watch": "nodemon --exec \"yarn test\"",
+    "lint": "eslint --fix ./src"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn eslint . --fix && yarn test"
+      "pre-commit": "yarn lint && yarn test"
     }
   },
   "dependencies": {

@@ -1,14 +1,14 @@
 import { platform } from 'os';
 import { execSync } from 'child_process';
 
-const LINUX = {
+const linux = {
   isLocked: () => {
     const process = execSync('ps -ef | grep kscreenlocker | wc -l');
-    return process === '2';
+    return process.toString().trim() === '3';
   },
 };
 
-const strategies = { LINUX };
+const strategies = { linux };
 
 const session = strategies[platform()];
 
