@@ -5,9 +5,11 @@ const environment = process.env.NODE_ENV || 'dev';
 
 const initializer = {};
 
+const baseFolder = `${__dirname}/..`;
+
 initializer.run = () => {
-  dotenv.config();
-  const especiftEnvConfig = `.env.${environment}`;
+  dotenv.config(baseFolder);
+  const especiftEnvConfig = `${baseFolder}/.env.${environment}`;
 
   if (existsSync(especiftEnvConfig)) {
     const envConfig = dotenv.parse(readFileSync(especiftEnvConfig));

@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize';
 import configFolder from './config_folder';
 
-let storage = process.env.DATABASE;
+let storage = process.env.DATABASE || 'database.sqlite';
 
-if (process.env.DATABASE.indexOf('sqlite') !== -1) {
+if (storage.indexOf('sqlite') !== -1) {
   storage = `${configFolder}/${storage}`;
 }
 

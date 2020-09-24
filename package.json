@@ -1,17 +1,19 @@
 {
   "name": "time-tracker",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/electron/app.js",
   "repository": "git@github.com:lucianoshl/time-tracker.git",
   "author": "Luciano Lopes <lucianoshl@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && babel src -d dist",
-    "electron": "yarn build && electron dist/electron/app.js",
+    "babel-build": "rm -rf dist && babel src -d dist",
+    "electron": "yarn babel-build && electron dist/electron/app.js",
     "test": "NODE_ENV=test mocha",
     "electron-watch": "nodemon --watch src --exec \"yarn electron\"",
     "test-watch": "nodemon --exec \"yarn test\"",
-    "lint": "eslint --fix ./src"
+    "lint": "eslint --fix ./src",
+    "build": "yarn babel-build && rm -rf bundle && mkdir bundle && cd bundle && electron-packager ../ time-tracker --platform=linux",
+    "fix-time": "babel-node src/fix_start_time.js"
   },
   "husky": {
     "hooks": {
@@ -36,6 +38,7 @@
     "nodemon": "^2.0.4",
     "regenerator-runtime": "^0.13.7",
     "sequelize": "^6.3.5",
+    "sprintf-js": "^1.1.2",
     "sqlite3": "^5.0.0"
   },
   "overrides": {
@@ -52,6 +55,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.11.5",
+    "electron-packager": "^15.1.0",
     "eslint": "^7.9.0",
     "eslint-config-airbnb": "^18.2.0"
   }

@@ -9,50 +9,74 @@ describe('entryRegister', () => it('simple register', async () => {
     truncate: true,
   });
 
-  const baseDate = moment().set({ hour: 1, minutes: 0, seconds: 0 });
+  const baseDate = moment().set({ hour: 10, minutes: 0, seconds: 0 });
   await entryRegister.register('APP_START', baseDate.toDate());
+  await entryRegister.register('UNLOCKED', baseDate.toDate());
 
-  const lock01 = baseDate.add(10, 'minutes');
-  await entryRegister.register('LOCK', lock01.toDate());
+  const lock01 = baseDate.set({ hour: 12 });
+  await entryRegister.register('LOCKED', lock01.toDate());
 
-  const unlock01 = lock01.add(3, 'minutes');
-  await entryRegister.register('UNLOCK', unlock01.toDate());
+  const unlock01 = baseDate.set({ hour: 14 });
+  await entryRegister.register('UNLOCKED', unlock01.toDate());
 
-  const lock02 = unlock01.add(45, 'minutes');
-  await entryRegister.register('LOCK', lock02.toDate());
-
-  const unlock02 = lock02.add(10, 'minutes');
-  await entryRegister.register('UNLOCK', unlock02.toDate());
-
-  const lock3 = unlock02.add(5, 'minutes');
-  await entryRegister.register('LOCK', lock3.toDate());
+  const lock02 = baseDate.set({ hour: 18 });
+  await entryRegister.register('LOCKED', lock02.toDate());
+  await entryRegister.register('APP_QUIT', lock02.toDate());
 
   const sumarize = await entryRegister.sumarize();
 
-  deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '01:03');
+  deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '06:00');
 }));
 
-describe('entryRegister', () => it('simple register with balance', async () => {
+describe('entryRegister', () => it('simple register with tolerance', async () => {
   await models.Event.destroy({
     where: {},
     truncate: true,
   });
 
-  const baseDate = moment().set({ hour: 1, minutes: 0, seconds: 0 });
+  const baseDate = moment().set({ hour: 10, minutes: 0, seconds: 0 });
   await entryRegister.register('APP_START', baseDate.toDate());
+  await entryRegister.register('UNLOCKED', baseDate.toDate());
 
-  const lock01 = baseDate.add(10, 'minutes');
-  await entryRegister.register('LOCK', lock01.toDate());
+  const lock01 = baseDate.set({ hour: 12 });
+  await entryRegister.register('LOCKED', lock01.toDate());
 
-  const unlock01 = lock01.add(5, 'minutes');
-  await entryRegister.register('UNLOCK', unlock01.toDate());
+  const unlock01 = baseDate.set({ hour: 14 });
+  await entryRegister.register('UNLOCKED', unlock01.toDate());
 
-  const lock02 = unlock01.add(45, 'minutes');
-  await entryRegister.register('LOCK', lock02.toDate());
+  await entryRegister.register('LOCKED', baseDate.set({ hour: 16, minutes: 5 }).toDate());
+  await entryRegister.register('UNLOCKED', baseDate.set({ hour: 16, minutes: 10 }).toDate());
+
+  const lock02 = baseDate.set({ hour: 18, minutes: 0 });
+  await entryRegister.register('LOCKED', lock02.toDate());
+  await entryRegister.register('APP_QUIT', lock02.toDate());
 
   const sumarize = await entryRegister.sumarize();
 
-  const formated = moment().startOf('day').milliseconds(sumarize).format('HH:mm');
+  deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '06:00');
+}));
 
-  deepStrictEqual(formated, '01:00');
+describe('entryRegister', () => it('with app_close', async () => {
+  await models.Event.destroy({
+    where: {},
+    truncate: true,
+  });
+
+  const baseDate = moment().set({ hour: 10, minutes: 0, seconds: 0 });
+  await entryRegister.register('APP_START', baseDate.toDate());
+  await entryRegister.register('UNLOCKED', baseDate.toDate());
+
+  const lock01 = baseDate.set({ hour: 12 });
+  await entryRegister.register('LOCKED', lock01.toDate());
+
+  const unlock01 = baseDate.set({ hour: 14 });
+  await entryRegister.register('UNLOCKED', unlock01.toDate());
+
+  const lock02 = baseDate.set({ hour: 18 });
+  await entryRegister.register('LOCKED', lock02.toDate());
+  await entryRegister.register('APP_QUIT', lock02.toDate());
+
+  const sumarize = await entryRegister.sumarize();
+
+  deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '06:00');
 }));

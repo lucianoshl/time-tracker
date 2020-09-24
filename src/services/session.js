@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 
 const linux = {
   isLocked: () => {
-    const process = execSync('ps -ef | grep kscreenlocker | wc -l');
+    const process = execSync('ps -ef | grep kscreenLOCKEDer | wc -l');
     return process.toString().trim() === '3';
   },
 };
