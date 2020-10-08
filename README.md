@@ -1,3 +1,3 @@
 # time-tracker
 
-Time-Tracking Destkop App
+Time-Tracking Desktop App
