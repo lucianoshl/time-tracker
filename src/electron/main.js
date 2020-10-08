@@ -14,11 +14,11 @@ const updateTray = async () => {
   const sumarized = await entryRegister.sumarize();
   const target = 1000 * 60 * 60 * 8 - sumarized;
 
-  const time = moment().startOf('day').add(sumarized, 'milliseconds').format('HH:mm:ss');
+  const time = moment().startOf('day').add(sumarized, 'milliseconds').format('HH:mm');
 
-  const tail = moment().startOf('day').add(target, 'milliseconds').format('HH:mm:ss');
+  const tail = moment().startOf('day').add(target, 'milliseconds').format('HH:mm');
 
-  const finish = moment().add(target, 'milliseconds').format('HH:mm:ss');
+  const finish = moment().add(target, 'milliseconds').format('HH:mm');
 
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: `Actual: ${time}` },
@@ -27,7 +27,7 @@ const updateTray = async () => {
     {
       label: 'Exit',
       async click() {
-        await entryRegister.registerQuit();
+        // await entryRegister.registerQuit();
         app.quit();
       },
     },
@@ -35,8 +35,9 @@ const updateTray = async () => {
 };
 
 const mainTick = async (args) => {
-  const isLoked = session.isLocked();
-  const event = isLoked ? entryRegister.register('LOCKED') : entryRegister.register('UNLOCKED');
+  const isLocked = session.isLocked();
+  console.log('isLocked', isLocked);
+  const event = isLocked ? entryRegister.register('LOCKED') : entryRegister.register('UNLOCKED');
   await updateTray({ ...args, event });
 };
 
@@ -44,9 +45,9 @@ app.whenReady().then(async () => {
   const imageTray = nativeImage.createFromPath(path.join(__dirname, '../../icon.png'));
   tray = new Tray(imageTray.resize({ width: 16, height: 16 }));
 
-  await entryRegister.registerQuit();
+  // await entryRegister.registerQuit();
   await entryRegister.register('APP_START');
 
   mainTick({ tray });
-  setInterval(() => mainTick({ tray }), 1000 * 5);
+  setInterval(() => mainTick({ tray }), 1000 * 50);
 });

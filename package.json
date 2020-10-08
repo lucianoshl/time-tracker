@@ -12,8 +12,7 @@
     "electron-watch": "nodemon --watch src --exec \"yarn electron\"",
     "test-watch": "nodemon --exec \"yarn test\"",
     "lint": "eslint --fix ./src",
-    "build": "yarn babel-build && rm -rf bundle && mkdir bundle && cd bundle && electron-packager ../ time-tracker --platform=linux",
-    "fix-time": "babel-node src/fix_start_time.js"
+    "build": "yarn babel-build && rm -rf bundle && mkdir bundle && cd bundle && electron-packager ../ time-tracker --platform=linux"
   },
   "husky": {
     "hooks": {

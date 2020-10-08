@@ -3,8 +3,9 @@ import { execSync } from 'child_process';
 
 const linux = {
   isLocked: () => {
-    const process = execSync('ps -ef | grep kscreenLOCKEDer | wc -l');
-    return process.toString().trim() === '3';
+    // TODO: only KDE!
+    const process = execSync('ps -ef | grep kscreenlocker | wc -l');
+    return parseInt(process.toString().trim(), 10) > 2;
   },
 };
 

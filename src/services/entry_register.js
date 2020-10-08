@@ -6,7 +6,7 @@ import models from '../models';
 const { Event } = models;
 
 const entryRegister = {};
-const tolerance = 1000 * 60 * 5;
+const tolerance = 1000 * 60 * 10;
 
 entryRegister.registerQuit = async () => {
   const lastEvent = await Event.findOne({
@@ -23,14 +23,8 @@ entryRegister.register = async (type, date = new Date()) => {
 
   if (lastEvent && type === lastEvent.type) {
     lastEvent.ocurrence = date;
-    // console.log('TYPE updating', type, 'last is ', lastEvent.type);
     await lastEvent.save();
   } else {
-    // if (!lastEvent) {
-    //   console.log('TYPE saving', type, 'last is is null');
-    // } else {
-    //   console.log('TYPE saving', type, 'last is ', lastEvent.type);
-    // }
     const result = await Event.create({ ocurrence: date, type });
     await result.save();
   }
@@ -51,14 +45,7 @@ entryRegister.sumarize = async () => {
 
   for (let i = 0; i < registers.length; i += 1) {
     const currentElement = registers[i];
-    let nextElement = registers[i + 1];
-
-    if (currentElement.type === 'UNLOCKED' && !nextElement) {
-      nextElement = {
-        ocurrence: new Date(),
-        type: 'LOCKED',
-      };
-    }
+    const nextElement = registers[i + 1];
 
     if (!nextElement) break;
 
@@ -66,9 +53,11 @@ entryRegister.sumarize = async () => {
 
     let elegible = false;
 
-    elegible ||= currentElement.type === 'UNLOCKED' && nextElement.type === 'LOCKED';
+    elegible ||= currentElement.type === 'APP_START' && nextElement.type === 'UNLOCKED';
 
-    elegible ||= currentElement.type === 'LOCKED' && nextElement.type === 'UNLOCKED' && diference <= tolerance;
+    elegible ||= currentElement.type === 'UNLOCKED' && nextElement.type === 'LOCKED' && (diference <= tolerance);
+
+    elegible ||= currentElement.type === 'LOCKED' && nextElement.type === 'UNLOCKED';
 
     if (elegible) {
       result += diference;
