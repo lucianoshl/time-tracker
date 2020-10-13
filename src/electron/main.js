@@ -45,9 +45,8 @@ app.whenReady().then(async () => {
   const imageTray = nativeImage.createFromPath(path.join(__dirname, '../../icon.png'));
   tray = new Tray(imageTray.resize({ width: 16, height: 16 }));
 
-  // await entryRegister.registerQuit();
   await entryRegister.register('APP_START');
 
   mainTick({ tray });
-  setInterval(() => mainTick({ tray }), 1000 * 50);
+  setInterval(() => mainTick({ tray }), 1000 * 60);
 });

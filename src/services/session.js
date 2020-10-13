@@ -1,16 +1,32 @@
-import { platform } from 'os';
+// import { platform } from 'os';
 import { execSync } from 'child_process';
 
-const linux = {
-  isLocked: () => {
-    // TODO: only KDE!
-    const process = execSync('ps -ef | grep kscreenlocker | wc -l');
-    return parseInt(process.toString().trim(), 10) > 2;
-  },
+const exec = (command) => execSync(command).toString().trim();
+
+const processRunning = (binName) => {
+  try {
+    exec(`pidof ${binName}`);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
-const strategies = { linux };
+const i3 = {
+  isLocked: () => processRunning('i3lock'),
+};
 
-const session = strategies[platform()];
+// const kde = {
+//   isLocked: () => processRunning('kscreenlocker'),
+// };
 
-export default session;
+// const strategies = { linux };
+
+// const session = strategies[platform()];
+
+export default (() => {
+  if (processRunning('i3')) {
+    return i3;
+  }
+  return undefined;
+})();
