@@ -1,4 +1,3 @@
-import { Op } from 'sequelize';
 import moment from 'moment';
 import { vsprintf } from 'sprintf-js';
 import models from '../models';
@@ -26,17 +25,30 @@ entryRegister.register = async (type, date = new Date()) => {
     await lastEvent.save();
   } else {
     const result = await Event.create({ ocurrence: date, type });
+
+    if (lastEvent) {
+      if (lastEvent.ocurrence.getDay() !== result.ocurrence.getDay()) {
+        const diffHours = (result.ocurrence - lastEvent.ocurrence) / 1000 / 60 / 60;
+        result.group = diffHours > 6 ? (lastEvent.group + 1) : lastEvent.group;
+      } else {
+        result.group = lastEvent.group;
+      }
+    } else {
+      result.group = 0;
+    }
+
     await result.save();
   }
 };
 
 entryRegister.sumarize = async () => {
+  const lastEvent = await Event.findOne({
+    order: [['createdAt', 'DESC']],
+  });
+
   const registers = await Event.findAll({
     where: {
-      ocurrence: {
-        [Op.gt]: moment().startOf('day'),
-        [Op.lt]: moment().endOf('day'),
-      },
+      group: lastEvent?.group || 0,
     },
     order: [['ocurrence', 'ASC']],
   });

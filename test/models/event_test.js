@@ -5,6 +5,7 @@ import models from '../../src/models';
 const { Event } = models;
 
 describe('eventModel', () => it('save item', async () => {
+  await connection.sync({});
   const event = await Event.create({ ocurrence: new Date(), type: 'USER_IN' });
   const query = await Event.findOne({ type: 'USER_IN' });
 

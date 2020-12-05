@@ -2,33 +2,45 @@ import moment from 'moment';
 import { deepStrictEqual } from 'assert';
 import models from '../src/models';
 import entryRegister from '../src/services/entry_register';
+import connection from '../src/utils/sequelize';
 
-const hour = (h, m = 0, s = 0) => moment().set({ hour: h, minutes: m, seconds: s }).toDate();
+const hour = (h, m = 0, s = 0, dayOffset = 0) => moment().set({ hour: h, minutes: m, seconds: s }).add(dayOffset, 'days').toDate();
 
-// describe('entryRegister', () => it('simple register', async () => {
-//   await models.Event.destroy({
-//     where: {},
-//     truncate: true,
-//   });
+const registerInterval = async (start, end, dayOffset = 0) => {
+  await entryRegister.register('LOCKED', hour(start, 0, 0, dayOffset));
+  await entryRegister.register('UNLOCKED', hour(end, 0, 0, dayOffset));
+}
 
-//   const baseDate = moment().set({ hour: 10, minutes: 0, seconds: 0 });
-//   await entryRegister.register('APP_START', baseDate.toDate());
-//   await entryRegister.register('UNLOCKED', baseDate.toDate());
+describe('entryRegister', () => it('test groups', async () => {
+  await connection.sync({});
 
-//   const lock01 = baseDate.set({ hour: 12 });
-//   await entryRegister.register('LOCKED', lock01.toDate());
+  await models.Event.destroy({
+    where: {},
+    truncate: true,
+  });
 
-//   const unlock01 = baseDate.set({ hour: 14 });
-//   await entryRegister.register('UNLOCKED', unlock01.toDate());
+  await registerInterval(1, 5)
+  await registerInterval(22, 23)
+  await registerInterval(1, 4, 1)
 
-//   const lock02 = baseDate.set({ hour: 18 });
-//   await entryRegister.register('LOCKED', lock02.toDate());
-//   await entryRegister.register('APP_QUIT', lock02.toDate());
+  const sumarize = await entryRegister.sumarize();
 
-//   const sumarize = await entryRegister.sumarize();
+  deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '08:00');
+}));
 
-//   deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '06:00');
-// }));
+describe('entryRegister', () => it('test register interval', async () => {
+  await models.Event.destroy({
+    where: {},
+    truncate: true,
+  });
+
+  await registerInterval(8, 12)
+  await registerInterval(14, 18)
+
+  const sumarize = await entryRegister.sumarize();
+
+  deepStrictEqual(moment.utc(sumarize).format('HH:mm'), '08:00');
+}));
 
 describe('entryRegister', () => it('simple register with tolerance', async () => {
   await models.Event.destroy({

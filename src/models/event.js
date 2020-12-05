@@ -7,4 +7,7 @@ export default {
   ocurrence: {
     type: DataTypes.DATE,
   },
+  group: {
+    type: DataTypes.INTEGER,
+  },
 };

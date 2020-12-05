@@ -7,8 +7,12 @@ import path from 'path';
 import moment from 'moment';
 import session from '../services/session';
 import entryRegister from '../services/entry_register';
+import connection from '../utils/sequelize';
 
+let mainTick = null;
 let tray = null;
+
+let tracking = true;
 
 const updateTray = async () => {
   const sumarized = await entryRegister.sumarize();
@@ -20,28 +24,54 @@ const updateTray = async () => {
 
   const finish = moment().add(target, 'milliseconds').format('HH:mm');
 
+  const trackingMenu = {
+    label: `Tracking: ${tracking}`,
+  };
+
+  trackingMenu.submenu = [
+    {
+      label: 'ON',
+      click: () => {
+        tracking = true;
+        trackingMenu.label = `Tracking: ${tracking}`;
+        mainTick({ tray });
+      },
+    },
+    {
+      label: 'OFF',
+      click: () => {
+        tracking = false;
+        trackingMenu.label = `Tracking: ${tracking}`;
+        mainTick({ tray });
+      },
+    },
+  ];
+
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: `Actual: ${time}` },
     { label: `Missing: ${tail}` },
     { label: `Finish in: ${finish}` },
+    trackingMenu,
     {
       label: 'Exit',
       async click() {
-        // await entryRegister.registerQuit();
         app.quit();
       },
     },
   ]));
 };
 
-const mainTick = async (args) => {
+mainTick = async (args) => {
+  if (!tracking) return;
+
   const isLocked = session.isLocked();
-  console.log('isLocked', isLocked);
   const event = isLocked ? entryRegister.register('LOCKED') : entryRegister.register('UNLOCKED');
-  await updateTray({ ...args, event });
+  await updateTray({ ...args, event, tracking });
 };
 
 app.whenReady().then(async () => {
+  await connection.sync({});
+
   const imageTray = nativeImage.createFromPath(path.join(__dirname, '../../icon.png'));
   tray = new Tray(imageTray.resize({ width: 16, height: 16 }));
 
